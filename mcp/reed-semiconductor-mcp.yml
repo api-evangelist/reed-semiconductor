@@ -1,0 +1,122 @@
+generated: '2026-08-26'
+method: probed
+source: https://www.reedsemi.com/.well-known/oauth-protected-resource
+name: Reed Semiconductor MCP Server
+description: >-
+  Reed Semiconductor's corporate WordPress site mounts a Model Context Protocol server
+  at the apex domain. It is real, reachable and OAuth-gated: an anonymous JSON-RPC
+  tools/list returns HTTP 401 with a WWW-Authenticate Bearer challenge naming the
+  RFC 9728 resource metadata document and the required scope. The server is provided
+  by the Novamira WordPress plugin (v1.11.4, REST API version 1) rather than authored
+  by Reed, but it is deployed on and served from the company's own host, so it is a
+  genuine agent surface for this provider.
+deployment:
+  mode: remote
+  endpoint: https://www.reedsemi.com/wp-json/mcp/novamira-oauth
+  auth: oauth
+  verified: probed
+transport: streamable-http
+servers:
+- name: novamira-oauth
+  endpoint: https://www.reedsemi.com/wp-json/mcp/novamira-oauth
+  methods:
+  - POST
+  - GET
+  - DELETE
+  auth: oauth
+  anonymous_tools_list:
+    status: 401
+    body: '{"code":"rest_oauth_required","message":"OAuth authentication required.","data":{"status":401}}'
+    www_authenticate: >-
+      Bearer resource_metadata="https://www.reedsemi.com/.well-known/oauth-protected-resource",
+      scope="mcp"
+- name: novamira
+  endpoint: https://www.reedsemi.com/wp-json/mcp/novamira
+  methods:
+  - POST
+  - GET
+  - DELETE
+  auth: wordpress-session
+  anonymous_tools_list:
+    status: 401
+    body: '{"code":"rest_forbidden","message":"Sorry, you are not allowed to do that.","data":{"status":401}}'
+  note: >-
+    Cookie/nonce-authenticated sibling of the OAuth server, intended for logged-in
+    WordPress administrators rather than external agents.
+- name: mcp-adapter-default-server
+  endpoint: https://www.reedsemi.com/wp-json/mcp/mcp-adapter-default-server
+  methods:
+  - POST
+  - GET
+  - DELETE
+  auth: wordpress-session
+  anonymous_tools_list:
+    status: 401
+    body: '{"code":"rest_forbidden","message":"Sorry, you are not allowed to do that.","data":{"status":401}}'
+  note: Default server registered by the WordPress MCP adapter.
+authorization:
+  model: oauth2.1
+  issuer: https://www.reedsemi.com
+  authorization_endpoint: https://www.reedsemi.com/wp-admin/admin.php?page=novamira-oauth-authorize
+  token_endpoint: https://www.reedsemi.com/wp-json/novamira/v1/oauth/token
+  registration_endpoint: https://www.reedsemi.com/wp-json/novamira/v1/oauth/register
+  revocation_endpoint: https://www.reedsemi.com/wp-json/novamira/v1/oauth/revoke
+  introspection_endpoint: https://www.reedsemi.com/wp-json/novamira/v1/oauth/introspect
+  device_authorization_endpoint: https://www.reedsemi.com/wp-json/novamira/v1/oauth/device
+  grant_types:
+  - authorization_code
+  - refresh_token
+  - 'urn:ietf:params:oauth:grant-type:device_code'
+  code_challenge_methods:
+  - S256
+  dynamic_client_registration: true
+  scopes:
+  - mcp
+tools:
+  status: gated
+  count: null
+  note: >-
+    NOT ENUMERATED. tools/list requires a bearer token with scope "mcp"; no tool list
+    is published anonymously and the provider ships no llms.txt naming tools. The tool
+    set and per-tool inputSchema require authenticated introspection. No tools are
+    listed here because none were observed — nothing is inferred or invented.
+related_surfaces:
+  wp_abilities_api:
+    endpoint: https://www.reedsemi.com/wp-json/wp-abilities/v1/abilities
+    status: 401
+    body: '{"code":"rest_oauth_required","message":"OAuth authentication required.","data":{"status":401}}'
+    note: >-
+      The WordPress Abilities API is registered and OAuth-gated behind the same scope.
+      It is the likely backing registry the MCP tools are projected from, but this was
+      not confirmed because both surfaces are gated.
+  novamira_rest_namespace:
+    endpoint: https://www.reedsemi.com/wp-json/novamira/v1
+    routes: 33
+    note: >-
+      Publicly enumerable route index covering OAuth endpoints, an abilities runner,
+      a chat/agent session surface and a Gutenberg batch worker. Route discovery is
+      anonymous; every non-OAuth route requires authentication.
+x-evidence:
+  fetched: '2026-08-26'
+  probes:
+  - url: https://www.reedsemi.com/.well-known/oauth-protected-resource
+    status: 200
+  - url: https://www.reedsemi.com/.well-known/oauth-authorization-server
+    status: 200
+  - url: https://www.reedsemi.com/wp-json/mcp
+    status: 200
+  - url: https://www.reedsemi.com/wp-json/mcp/novamira-oauth
+    status: 401
+    method: 'POST tools/list'
+  - url: https://www.reedsemi.com/wp-json/wp-abilities/v1/abilities
+    status: 401
+plugin:
+  name: Novamira
+  version: 1.11.4
+  rest_api_version: 1
+  wordpress_version: '7.1'
+  features:
+    abilities_bearer_auth: true
+    agent_context: true
+    rest_skills: true
+    generalized_execution_shim: true

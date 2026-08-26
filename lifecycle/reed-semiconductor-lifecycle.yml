@@ -1,0 +1,93 @@
+generated: '2026-08-26'
+method: probed
+source: https://www.reedsemi.com/wp-json/
+name: Reed Semiconductor Lifecycle
+description: >-
+  Versioning, deprecation and availability posture for the API surfaces at
+  www.reedsemi.com. Reed operates no developer program, so there is no API SLA, no status
+  page and no deprecation policy. What exists is inherited from WordPress and WooCommerce
+  conventions. The one genuine lifecycle document the company does publish is a Product
+  Obsolescence Policy — but it governs silicon, not endpoints.
+api_versioning:
+  scheme: path-namespace
+  pattern: /wp-json/{namespace}/{version}/
+  current:
+  - namespace: wc/store
+    version: v1
+  - namespace: wp
+    version: v2
+  - namespace: wc
+    version: v3
+  - namespace: novamira
+    version: v1
+  - namespace: wp-abilities
+    version: v1
+  concurrent_majors:
+  - wc/v1
+  - wc/v2
+  - wc/v3
+  note: >-
+    Older WooCommerce majors remain mounted alongside v3, so historical clients keep
+    working. This is a WooCommerce default, not a stated Reed commitment.
+deprecation:
+  policy_published: false
+  policy_url: null
+  sunset_header: false
+  deprecation_header: false
+  rfc8594: false
+  deprecated_operations: []
+  note: >-
+    No RFC 8594 Sunset or Deprecation header was returned on any probed response, and no
+    deprecation policy page exists. No Deprecation pointer is emitted in apis.yml.
+status_page:
+  present: false
+  url: null
+  probes:
+  - url: https://status.reedsemi.com/
+    status: '<no response — DNS did not resolve>'
+  note: >-
+    No status page, uptime history or incident feed of any kind. No StatusPage pointer is
+    emitted in apis.yml.
+sla:
+  published: false
+  note: No availability or support-response commitment is published for any API surface.
+changelog:
+  api_changelog: false
+  product_newsroom:
+    url: https://www.reedsemi.com/newsroom/
+    feed: https://www.reedsemi.com/feed/
+    machine_readable: https://www.reedsemi.com/wp-json/wp/v2/posts
+    note: >-
+      Dated announcements about silicon, not about the API. Recent entries: 2026-08-24
+      RS95F36 150A top-side-cooled smart power stage; 2026-06-25 $100M funding round;
+      2026-04-17 and 2026-01-23 PTAB/USPTO patent outcomes vs Monolithic Power Systems;
+      2025-11-20 RS31512 20A eFuse with PMBus telemetry. Wired as Blog, not ChangeLog —
+      it does not record contract changes.
+product_lifecycle:
+  obsolescence_policy_published: true
+  source: https://www.reedsemi.com/quality/
+  document: Product Obsolescence Policy (PDF)
+  note: >-
+    Reed publishes a formal obsolescence/EOL policy for its silicon parts. It is a real
+    lifecycle commitment to customers, but it governs part availability, not API
+    versions, and is not reachable as structured data.
+platform_versions_observed:
+  wordpress: '7.1'
+  novamira_plugin: 1.11.4
+  novamira_rest_api_version: 1
+  note: >-
+    Because the API surface is a side effect of the CMS stack, its real lifecycle is the
+    plugin's upgrade cadence. A Novamira or WooCommerce major upgrade can change or remove
+    routes with no notice to any API consumer.
+x-evidence:
+  fetched: '2026-08-26'
+  probes:
+  - url: https://www.reedsemi.com/wp-json/
+    status: 200
+  - url: https://www.reedsemi.com/wp-json/wc/store/v1/products?per_page=1
+    status: 200
+  - url: https://status.reedsemi.com/
+    status: 0
+    note: DNS did not resolve.
+  - url: https://www.reedsemi.com/quality/
+    status: 200

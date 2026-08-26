@@ -1,0 +1,101 @@
+generated: '2026-08-26'
+method: probed
+source: https://www.reedsemi.com/wp-json/
+name: Reed Semiconductor Error Catalog
+description: >-
+  Error catalog for the REST surfaces served at www.reedsemi.com. Reed publishes no error
+  reference — no developer documentation exists — so every entry below was produced by
+  making the failing call and recording the verbatim response body. Nothing here is
+  inferred from the WordPress or WooCommerce upstream documentation; only errors this
+  pipeline actually elicited are listed.
+format: wordpress-rest
+rfc9457: false
+content_type: application/json; charset=UTF-8
+envelope:
+  code: Machine-readable slug identifying the error class.
+  message: Human-readable sentence.
+  data.status: HTTP status code, repeated in the body.
+  data.params: Present on validation errors — map of parameter name to message.
+  data.details: Present on validation errors — per-parameter nested error object.
+error_count: 6
+errors:
+- code: rest_no_route
+  status: 404
+  title: No matching route
+  message: No route was found matching the URL and request method.
+  cause: The path or HTTP method is not mounted in the requested namespace.
+  remediation: >-
+    Fetch the namespace index (e.g. GET /wp-json/wc/store/v1) and read routes[] — the
+    server publishes its own complete route table anonymously.
+  observed_at: https://www.reedsemi.com/wp-json/wc/store/v1/nope
+- code: rest_invalid_param
+  status: 400
+  title: Invalid parameter
+  message: 'Invalid parameter(s): per_page'
+  cause: A query parameter failed the route's declared schema validation.
+  remediation: >-
+    Read data.details[param].message for the exact bound. Observed example:
+    "per_page must be between 1 (inclusive) and 100 (inclusive)".
+  observed_at: https://www.reedsemi.com/wp-json/wc/store/v1/products?per_page=500
+- code: woocommerce_rest_product_invalid_id
+  status: 404
+  title: Invalid product ID
+  message: Invalid product ID.
+  cause: The requested product does not exist or is not published.
+  remediation: >-
+    Enumerate valid ids from GET /wc/store/v1/products; the catalog is 99 items and fully
+    paginated via X-WP-Total / X-WP-TotalPages.
+  observed_at: https://www.reedsemi.com/wp-json/wc/store/v1/products/99999999
+- code: rest_oauth_required
+  status: 401
+  title: OAuth authentication required
+  message: OAuth authentication required.
+  cause: >-
+    Called an OAuth-protected resource (the MCP server or the WordPress Abilities API)
+    without a bearer token carrying the "mcp" scope.
+  remediation: >-
+    Follow the WWW-Authenticate challenge to
+    /.well-known/oauth-protected-resource, register dynamically at
+    /wp-json/novamira/v1/oauth/register, and complete an authorization-code + PKCE S256
+    flow for scope "mcp".
+  www_authenticate: >-
+    Bearer resource_metadata="https://www.reedsemi.com/.well-known/oauth-protected-resource",
+    scope="mcp"
+  observed_at: https://www.reedsemi.com/wp-json/mcp/novamira-oauth
+- code: rest_forbidden
+  status: 401
+  title: Not allowed
+  message: Sorry, you are not allowed to do that.
+  cause: >-
+    Called a cookie/nonce-authenticated route (the non-OAuth MCP servers, Novamira admin
+    routes) without a logged-in WordPress session.
+  remediation: >-
+    Not reachable by an external agent. Use the OAuth-protected MCP server at
+    /wp-json/mcp/novamira-oauth instead.
+  observed_at: https://www.reedsemi.com/wp-json/mcp/novamira
+- code: rest_out_of_bounds
+  status: 400
+  title: Parameter out of bounds
+  message: per_page must be between 1 (inclusive) and 100 (inclusive)
+  cause: Nested detail code inside a rest_invalid_param response.
+  remediation: Clamp the parameter to the stated inclusive range.
+  observed_at: https://www.reedsemi.com/wp-json/wc/store/v1/products?per_page=500
+  note: Appears at data.details[param].code, not at the top level.
+gaps:
+- >-
+  No published error reference exists. This catalog covers only the failure modes the
+  pipeline could trigger anonymously; the authenticated MCP, checkout and Abilities
+  surfaces will emit codes not listed here.
+x-evidence:
+  fetched: '2026-08-26'
+  probes:
+  - url: https://www.reedsemi.com/wp-json/wc/store/v1/nope
+    status: 404
+  - url: https://www.reedsemi.com/wp-json/wc/store/v1/products/99999999
+    status: 404
+  - url: https://www.reedsemi.com/wp-json/wc/store/v1/products?per_page=500
+    status: 400
+  - url: https://www.reedsemi.com/wp-json/mcp/novamira-oauth
+    status: 401
+  - url: https://www.reedsemi.com/wp-json/mcp/novamira
+    status: 401

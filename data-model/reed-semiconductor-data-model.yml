@@ -1,0 +1,213 @@
+generated: '2026-08-26'
+method: derived
+source: 'probed route index https://www.reedsemi.com/wp-json/wc/store/v1 + live records from /wc/store/v1/products, /products/categories'
+name: Reed Semiconductor Data Model
+description: >-
+  Entity graph for the publicly readable surfaces at www.reedsemi.com. Derived from the
+  server's own machine-readable route index and from records actually fetched — there is
+  no OpenAPI and no object reference to read. The commercially interesting entity is
+  Product: it carries Reed's parametric power-management part catalog, and its category
+  graph doubles as the company's application and technology taxonomy.
+entities:
+- name: Product
+  resource: /wc/store/v1/products
+  id_field: id
+  id_type: integer
+  count_observed: 99
+  key_fields:
+  - id
+  - name
+  - slug
+  - permalink
+  - sku
+  - type
+  - description
+  - short_description
+  - prices
+  - is_purchasable
+  - is_in_stock
+  - categories
+  - images
+  - add_to_cart
+  description: >-
+    A Reed power-management part. Observed examples: RS95F36 (150A top-side-cooled smart
+    power stage), RSM3517, RS16630. The part number is carried in `name`; `sku` is empty
+    across the catalog. Datasheet-grade detail (current rating, topology, package) lives
+    as prose/HTML inside `description`, not as structured attributes — `attributes` is an
+    empty array on every record observed, so there is no machine-readable parametric
+    search.
+  relationships:
+  - type: has_many
+    target: ProductCategory
+    via: categories[]
+  - type: has_many
+    target: ProductImage
+    via: images[]
+  - type: has_many
+    target: ProductReview
+    via: /wc/store/v1/products/reviews?product_id=
+  - type: belongs_to
+    target: ProductBrand
+    via: /wc/store/v1/products/brands
+- name: ProductCategory
+  resource: /wc/store/v1/products/categories
+  id_field: id
+  count_observed: 81
+  key_fields:
+  - id
+  - name
+  - slug
+  - parent
+  - count
+  description: >-
+    Reed's own taxonomy, doing double duty as application segmentation and electrical
+    classification. Observed members include the application axis (Data Center and AI,
+    Automotive, Communication Equipment, Industrial, Appliance, Base station, Accelerator
+    Card, Battery backup unit, Building automation, Camera modules, Datacom modules,
+    Asset tracking devices, Advanced driver assistance systems, Artificial intelligence),
+    the rail-voltage axis (48V, 12V, 3.3V, 48V Total Solution, 12V distribution power
+    systems) and the topology axis (DC/DC module, Active).
+  relationships:
+  - type: has_many
+    target: Product
+    via: count
+  - type: belongs_to
+    target: ProductCategory
+    via: parent
+    note: Self-referential hierarchy — top-level buckets Applications (99) and Categories (99).
+- name: ProductBrand
+  resource: /wc/store/v1/products/brands
+  id_field: id
+  relationships:
+  - type: has_many
+    target: Product
+- name: ProductTag
+  resource: /wc/store/v1/products/tags
+  id_field: id
+  relationships:
+  - type: has_many
+    target: Product
+- name: ProductAttribute
+  resource: /wc/store/v1/products/attributes
+  id_field: id
+  relationships:
+  - type: has_many
+    target: ProductAttributeTerm
+    via: /wc/store/v1/products/attributes/{attribute_id}/terms
+  note: >-
+    Mounted, but unused — every Product observed returns attributes: []. The parametric
+    fields a design engineer would filter on are not modelled.
+- name: ProductReview
+  resource: /wc/store/v1/products/reviews
+  id_field: id
+  relationships:
+  - type: belongs_to
+    target: Product
+- name: Cart
+  resource: /wc/store/v1/cart
+  id_field: Cart-Token (header)
+  key_fields:
+  - items
+  - coupons
+  - fees
+  - totals
+  - shipping_rates
+  description: >-
+    Session-scoped, anonymously creatable (GET /wc/store/v1/cart returns an empty cart
+    with HTTP 200 and no credential). Identified by the Cart-Token response header.
+  relationships:
+  - type: has_many
+    target: CartItem
+    via: items[]
+  - type: has_many
+    target: Coupon
+    via: coupons[]
+- name: CartItem
+  resource: /wc/store/v1/cart/items/{key}
+  id_field: key
+  id_type: 32-character string
+  relationships:
+  - type: belongs_to
+    target: Cart
+  - type: belongs_to
+    target: Product
+    via: id
+- name: Coupon
+  resource: /wc/store/v1/cart/coupons/{code}
+  id_field: code
+  relationships:
+  - type: belongs_to
+    target: Cart
+- name: Order
+  resource: /wc/store/v1/order/{id}
+  id_field: id
+  id_type: integer
+  relationships:
+  - type: belongs_to
+    target: Cart
+  note: >-
+    Inert. Every product is is_purchasable false at price 0, so no order can originate
+    from the public catalog.
+- name: Post
+  resource: /wp/v2/posts
+  id_field: id
+  key_fields:
+  - id
+  - date
+  - slug
+  - title
+  - content
+  - excerpt
+  - categories
+  - tags
+  - featured_media
+  description: >-
+    Newsroom entries — product introductions (RS31512, RS31390, RSM3512, RS86620),
+    corporate news (a $100M funding round, June 2026) and patent-proceeding outcomes
+    against Monolithic Power Systems.
+  relationships:
+  - type: has_many
+    target: Category
+    via: categories[]
+  - type: has_one
+    target: Media
+    via: featured_media
+- name: Page
+  resource: /wp/v2/pages
+  id_field: id
+  relationships:
+  - type: belongs_to
+    target: Page
+    via: parent
+- name: Media
+  resource: /wp/v2/media
+  id_field: id
+  relationships:
+  - type: belongs_to
+    target: Post
+    via: post
+findings:
+  parametric_search: false
+  parametric_search_note: >-
+    The single largest gap for this provider's actual buyers. Reed's catalog is exposed
+    as e-commerce products with empty attributes and zero prices, so an agent can list all
+    99 parts and their application categories but cannot filter on current, voltage,
+    topology, package or efficiency — those values exist only as HTML prose inside
+    description. A structured attribute set would turn a product listing into a usable
+    part-selection API.
+  price_data: false
+  sku_data: false
+render: null
+x-evidence:
+  fetched: '2026-08-26'
+  probes:
+  - url: https://www.reedsemi.com/wp-json/wc/store/v1
+    status: 200
+  - url: https://www.reedsemi.com/wp-json/wc/store/v1/products?per_page=1
+    status: 200
+  - url: https://www.reedsemi.com/wp-json/wc/store/v1/products/categories
+    status: 200
+  - url: https://www.reedsemi.com/wp-json/wc/store/v1/cart
+    status: 200
+  - url: https://www.reedsemi.com/wp-json/wp/v2/posts?per_page=10
+    status: 200

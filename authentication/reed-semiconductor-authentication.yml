@@ -1,0 +1,111 @@
+generated: '2026-08-26'
+method: probed
+source: https://www.reedsemi.com/wp-json/
+name: Reed Semiconductor Authentication
+description: >-
+  Reed Semiconductor publishes no OpenAPI and no authentication documentation — it runs
+  no developer program. This profile is built entirely from live probes of the REST and
+  MCP surfaces its WordPress deployment serves, and from the OAuth metadata documents at
+  /.well-known/. Three distinct authentication regimes coexist on one host.
+derived_from: probes
+schemes:
+- id: none
+  type: none
+  applies_to:
+  - https://www.reedsemi.com/wp-json/wc/store/v1/products
+  - https://www.reedsemi.com/wp-json/wc/store/v1/products/categories
+  - https://www.reedsemi.com/wp-json/wc/store/v1/products/brands
+  - https://www.reedsemi.com/wp-json/wp/v2/posts
+  - https://www.reedsemi.com/wp-json/wp/v2/pages
+  - https://www.reedsemi.com/wp-json/wp/v2/media
+  description: >-
+    Public read. The WooCommerce Store API product catalog and the WordPress content
+    API answer anonymously with HTTP 200 and no credential of any kind. Verified against
+    /wc/store/v1/products (99 items, X-WP-Total: 99) and /wp/v2/posts (10 items).
+  verified: probed
+- id: oauth2
+  type: oauth2
+  applies_to:
+  - https://www.reedsemi.com/wp-json/mcp/novamira-oauth
+  - https://www.reedsemi.com/wp-json/wp-abilities/v1/abilities
+  description: >-
+    OAuth 2.1 bearer tokens, advertised via RFC 8414 authorization-server metadata and
+    RFC 9728 protected-resource metadata. Authorization-code with mandatory PKCE S256,
+    refresh tokens, and the RFC 8628 device-code grant. Public clients
+    (token_endpoint_auth_methods: none) with open RFC 7591 dynamic client registration.
+    Single scope: mcp. Bearer token is presented in the Authorization header.
+  issuer: https://www.reedsemi.com
+  bearer_methods:
+  - header
+  scopes:
+  - mcp
+  challenge_observed: >-
+    WWW-Authenticate: Bearer
+    resource_metadata="https://www.reedsemi.com/.well-known/oauth-protected-resource",
+    scope="mcp"
+  verified: probed
+- id: wordpress-application-passwords
+  type: http
+  scheme: basic
+  applies_to:
+  - https://www.reedsemi.com/wp-json/wp/v2/
+  description: >-
+    WordPress Application Passwords, advertised in the /wp-json/ root discovery document
+    under authentication.application-passwords. Used for authenticated writes to the
+    content API. Authorization page is /wp-admin/authorize-application.php.
+  authorization_endpoint: https://www.reedsemi.com/wp-admin/authorize-application.php
+  verified: probed
+- id: wordpress-cookie-nonce
+  type: apiKey
+  in: header
+  name: X-WP-Nonce
+  applies_to:
+  - https://www.reedsemi.com/wp-json/mcp/novamira
+  - https://www.reedsemi.com/wp-json/mcp/mcp-adapter-default-server
+  - https://www.reedsemi.com/wp-json/novamira/v1/
+  description: >-
+    Cookie + nonce authentication for same-origin, logged-in WordPress sessions. The two
+    non-OAuth MCP servers and the Novamira admin routes reject anonymous calls with
+    rest_forbidden under this regime. Not usable by an external agent.
+  verified: probed
+cors:
+  access_control_allow_headers:
+  - Authorization
+  - X-WP-Nonce
+  - Content-Disposition
+  - Content-MD5
+  - Content-Type
+  - Cart-Token
+  - Nonce
+  access_control_expose_headers:
+  - X-WP-Total
+  - X-WP-TotalPages
+  - Link
+  - Cart-Token
+findings:
+  public_read: true
+  oauth_present: true
+  api_keys: false
+  mtls: false
+  openid_connect_claim: >-
+    An /.well-known/openid-configuration document is served, but it is byte-identical to
+    the OAuth authorization-server metadata: no jwks_uri, no userinfo_endpoint, no
+    id_token signing algorithms, no subject types. It advertises OAuth, not OIDC.
+    Treat the OIDC discovery path as an alias, not as OpenID Connect support.
+x-evidence:
+  fetched: '2026-08-26'
+  probes:
+  - url: https://www.reedsemi.com/wp-json/
+    status: 200
+  - url: https://www.reedsemi.com/wp-json/wc/store/v1/products?per_page=3
+    status: 200
+  - url: https://www.reedsemi.com/wp-json/wp/v2/posts?per_page=10
+    status: 200
+  - url: https://www.reedsemi.com/wp-json/mcp/novamira-oauth
+    status: 401
+  - url: https://www.reedsemi.com/wp-json/mcp/novamira
+    status: 401
+  - url: https://www.reedsemi.com/wp-json/wp-abilities/v1/abilities
+    status: 401
+  - url: https://www.reedsemi.com/.well-known/openid-configuration
+    status: 200

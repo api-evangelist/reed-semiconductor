@@ -1,0 +1,193 @@
+generated: '2026-08-26'
+method: searched
+source: 'https://www.reedsemi.com/quality/ + probed /.well-known/ metadata documents'
+name: Reed Semiconductor Conformance and Compliance
+description: >-
+  Two separate things are recorded here, and they should not be conflated. The technical
+  conformance entries were established by probing the live API surface — the OAuth and
+  MCP stack the site serves genuinely implements a stack of IETF RFCs. The corporate
+  compliance entries were read off Reed's published Quality page, which names real,
+  document-backed certifications for the semiconductor business. Reed makes no API
+  compliance claim of any kind, because it makes no API claim of any kind.
+conformance:
+- id: oauth2
+  name: OAuth 2.0 / 2.1
+  conforms: true
+  evidence: >-
+    Authorization-code grant with mandatory PKCE S256, refresh tokens, public clients,
+    bearer tokens in the Authorization header. Declared in
+    /.well-known/oauth-authorization-server and confirmed by the WWW-Authenticate
+    challenge returned from the MCP endpoint.
+  source: https://www.reedsemi.com/.well-known/oauth-authorization-server
+- id: rfc8414
+  name: OAuth 2.0 Authorization Server Metadata
+  conforms: true
+  evidence: >-
+    /.well-known/oauth-authorization-server returns a valid metadata document with issuer,
+    authorization_endpoint, token_endpoint, response_types_supported, grant_types_supported,
+    code_challenge_methods_supported and scopes_supported.
+  source: https://www.reedsemi.com/.well-known/oauth-authorization-server
+- id: rfc9728
+  name: OAuth 2.0 Protected Resource Metadata
+  conforms: true
+  evidence: >-
+    /.well-known/oauth-protected-resource declares resource, authorization_servers,
+    bearer_methods_supported and scopes_supported, and the 401 challenge from the MCP
+    endpoint points back at it via the resource_metadata parameter — the full RFC 9728
+    discovery loop closes.
+  source: https://www.reedsemi.com/.well-known/oauth-protected-resource
+- id: rfc7591
+  name: OAuth 2.0 Dynamic Client Registration
+  conforms: true
+  evidence: registration_endpoint /wp-json/novamira/v1/oauth/register is advertised and open.
+  source: https://www.reedsemi.com/.well-known/oauth-authorization-server
+- id: rfc7636
+  name: PKCE
+  conforms: true
+  evidence: 'code_challenge_methods_supported: ["S256"] — plain is not offered.'
+  source: https://www.reedsemi.com/.well-known/oauth-authorization-server
+- id: rfc8628
+  name: OAuth 2.0 Device Authorization Grant
+  conforms: true
+  evidence: >-
+    device_authorization_endpoint /wp-json/novamira/v1/oauth/device and grant type
+    urn:ietf:params:oauth:grant-type:device_code are both advertised.
+  source: https://www.reedsemi.com/.well-known/oauth-authorization-server
+- id: rfc7662
+  name: OAuth 2.0 Token Introspection
+  conforms: true
+  evidence: introspection_endpoint /wp-json/novamira/v1/oauth/introspect is advertised.
+  source: https://www.reedsemi.com/.well-known/oauth-authorization-server
+- id: rfc7009
+  name: OAuth 2.0 Token Revocation
+  conforms: true
+  evidence: revocation_endpoint /wp-json/novamira/v1/oauth/revoke is advertised.
+  source: https://www.reedsemi.com/.well-known/oauth-authorization-server
+- id: mcp
+  name: Model Context Protocol
+  conforms: true
+  evidence: >-
+    A JSON-RPC 2.0 MCP endpoint is mounted at /wp-json/mcp/novamira-oauth and returns the
+    RFC 9728 bearer challenge on an anonymous tools/list. Protocol version was not
+    confirmed because initialize/tools/list are OAuth-gated.
+  partial: true
+  source: https://www.reedsemi.com/wp-json/mcp/novamira-oauth
+- id: oidc
+  name: OpenID Connect Discovery
+  conforms: false
+  evidence: >-
+    /.well-known/openid-configuration is served but is byte-identical to the OAuth
+    authorization-server metadata — no jwks_uri, no userinfo_endpoint, no
+    id_token_signing_alg_values_supported, no subject_types_supported. The path is present;
+    OpenID Connect is not implemented.
+  source: https://www.reedsemi.com/.well-known/openid-configuration
+- id: rfc9457
+  name: Problem Details for HTTP APIs
+  conforms: false
+  evidence: >-
+    Errors use the WordPress {code, message, data.status} envelope with content type
+    application/json, not application/problem+json.
+  source: errors/reed-semiconductor-problem-types.yml
+- id: rfc8288
+  name: Web Linking
+  conforms: true
+  evidence: >-
+    Link headers with rel="next"/"prev" are returned on paginated collections and are
+    listed in Access-Control-Expose-Headers.
+  source: https://www.reedsemi.com/wp-json/wc/store/v1/products?per_page=3
+- id: pagination
+  name: Documented pagination
+  conforms: true
+  evidence: 'page/per_page params with X-WP-Total, X-WP-TotalPages and Link headers.'
+  source: conventions/reed-semiconductor-conventions.yml
+- id: idempotency
+  name: Idempotent write semantics
+  conforms: false
+  evidence: >-
+    No Idempotency-Key header is accepted or advertised on any route; cart mutations are
+    not idempotent.
+  source: conventions/reed-semiconductor-conventions.yml
+- id: rfc8594
+  name: Sunset / Deprecation headers
+  conforms: false
+  evidence: No Sunset or Deprecation header observed on any response.
+  source: lifecycle/reed-semiconductor-lifecycle.yml
+- id: rfc9116
+  name: security.txt
+  conforms: false
+  evidence: >-
+    /.well-known/security.txt returns HTTP 200 carrying the site's HTML catch-all page,
+    not an RFC 9116 document.
+  source: well-known/reed-semiconductor-well-known.yml
+compliance:
+  published: true
+  source: https://www.reedsemi.com/quality/
+  scope: corporate and product — NOT API, information-security or data-protection
+  certifications:
+  - id: iso-9001
+    name: ISO 9001:2015
+    status: certified
+    evidence: >-
+      Named on the Quality page as held, with a downloadable ISO 9001 certificate PDF.
+    document: ISO 9001 Certification (PDF)
+  - id: rohs
+    name: RoHS
+    status: compliant
+    detail: EU Directive 2011/65/EU as amended by Directive (EU) 2015/863
+    document: RoHS and Green Declaration; RoHS, HF and REACH Declaration (PDFs)
+  - id: reach
+    name: REACH
+    status: compliant
+    document: RoHS, HF and REACH Declaration (PDF)
+  - id: halogen-free
+    name: Halogen-Free (HF)
+    status: compliant
+    document: RoHS, HF and REACH Declaration (PDF)
+  - id: cdp
+    name: CDP Climate Disclosure
+    status: 'B score (2025)'
+    detail: Cited as evidence of structured climate governance.
+    document: CDP Performance report; Climate Action Statement (PDFs)
+  other_documents:
+  - Product Obsolescence Policy
+  - Corporate Social Responsibility Policy Statement
+  not_claimed:
+  - SOC 2
+  - ISO 27001
+  - ISO 14001
+  - IATF 16949
+  - AEC-Q100 / AEC-Q101
+  - PCI DSS
+  - HIPAA
+  - FedRAMP
+  - GDPR certification
+  note: >-
+    No information-security or data-protection certification is claimed anywhere on the
+    site. Notably, no automotive qualification (AEC-Q100/Q101, IATF 16949) is named even
+    though the company markets automotive and ADAS parts — that absence is a finding, not
+    an oversight on our part.
+domain_standard:
+  claimed_in_contract: false
+  candidate: PMBus
+  note: >-
+    REWARD-ONLY CHECK, NOT AWARDED. PMBus is the domain standard for digital power
+    management and Reed's own newsroom advertises "PMBus digital telemetry" on the RS31512
+    and RS31390 eFuses, so the company genuinely speaks it. But PMBus is an I2C-layer
+    device protocol implemented in silicon; it is not declared by, or reachable through,
+    any API contract Reed publishes. The product records that mention it carry the string
+    only inside prose HTML in `description`. Recorded here for accuracy and explicitly NOT
+    counted as domain-standard conformance of the contract.
+x-evidence:
+  fetched: '2026-08-26'
+  probes:
+  - url: https://www.reedsemi.com/quality/
+    status: 200
+  - url: https://www.reedsemi.com/.well-known/oauth-authorization-server
+    status: 200
+  - url: https://www.reedsemi.com/.well-known/oauth-protected-resource
+    status: 200
+  - url: https://www.reedsemi.com/.well-known/openid-configuration
+    status: 200
+  - url: https://www.reedsemi.com/.well-known/security.txt
+    status: 200
+    note: HTML catch-all, not a document.

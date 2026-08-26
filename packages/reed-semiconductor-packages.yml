@@ -1,0 +1,46 @@
+generated: '2026-08-26'
+method: searched
+source: 'registry searches — npm, PyPI, GitHub'
+name: Reed Semiconductor Packages
+description: >-
+  No first-party client libraries, SDKs or packages exist. Reed Semiconductor is a fabless
+  semiconductor company with no developer program; nothing is published to any package
+  registry under its name, and it has no GitHub organisation. This file records the search
+  so a later round does not repeat it. No SDKs or Packages pointer is emitted in apis.yml
+  because there is nothing to point at.
+package_count: 0
+packages: []
+registries_checked:
+- registry: npm
+  query: reedsemi
+  url: https://registry.npmjs.org/-/v1/search?text=reedsemi
+  result: 0 packages
+  status: 200
+- registry: pypi
+  query: reedsemi
+  url: https://pypi.org/pypi/reedsemi/json
+  result: absent
+  status: 404
+- registry: github
+  query: 'org:reedsemi'
+  url: https://api.github.com/orgs/reedsemi
+  result: no organisation
+  status: 404
+- registry: github
+  query: 'users search "reed semiconductor"'
+  url: https://api.github.com/search/users?q=reed+semiconductor
+  result: 0 users
+  status: 200
+subdomains_checked:
+- host: developer.reedsemi.com
+  result: DNS did not resolve
+- host: docs.reedsemi.com
+  result: DNS did not resolve
+- host: api.reedsemi.com
+  result: DNS did not resolve
+note: >-
+  The only client-side JavaScript on the site is WordPress/WooCommerce theme and plugin
+  code delivered from cdn.reedsemi.com. It is site chrome, not a distributable SDK, and is
+  not recorded as a package.
+x-evidence:
+  fetched: '2026-08-26'

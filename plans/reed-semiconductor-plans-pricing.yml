@@ -1,0 +1,48 @@
+generated: '2026-08-26'
+method: searched
+source: https://www.reedsemi.com/
+name: Reed Semiconductor Plans and Pricing
+description: >-
+  Reed Semiconductor publishes no plans, tiers or prices — for its APIs or for its silicon.
+  It is a fabless component vendor that sells through direct engagement and authorised
+  distributors (EDOM Technology in Asia, C.R.G Electronics in Israel), and its API surface
+  is an unmonetised side effect of its corporate WordPress site.
+plan_count: 0
+pricing_url: null
+plans: []
+api_pricing:
+  model: none
+  free_tier: true
+  note: >-
+    The Store API product catalog and the WordPress content API are anonymous and free to
+    read. The MCP server is OAuth-gated but there is no billing, metering or plan attached
+    to a token — RFC 7591 dynamic client registration is open.
+product_pricing:
+  published: false
+  note: >-
+    The WooCommerce catalog is deliberately not a storefront: all 99 products return
+    prices.price "0" and is_purchasable false, with add_to_cart.text set to "Read more".
+    WooCommerce is being used as a parametric product catalog, not a commerce engine, so
+    the zero prices are a modelling artifact and must not be read as free parts.
+  verified: probed
+  probe:
+    url: https://www.reedsemi.com/wp-json/wc/store/v1/products?per_page=1
+    status: 200
+    observed:
+      prices.price: '0'
+      is_purchasable: false
+      add_to_cart.text: Read more
+distribution:
+  model: direct-and-distributor
+  note: >-
+    Quotes are obtained through https://www.reedsemi.com/contact-us/ or through
+    distributors. No self-serve purchase path exists on the site.
+x-evidence:
+  fetched: '2026-08-26'
+  probes:
+  - url: https://www.reedsemi.com/
+    status: 200
+  - url: https://www.reedsemi.com/shop/
+    status: 200
+  - url: https://www.reedsemi.com/wp-json/wc/store/v1/products?per_page=1
+    status: 200

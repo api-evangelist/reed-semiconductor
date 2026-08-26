@@ -1,0 +1,45 @@
+generated: '2026-08-26'
+method: probed
+source: 'observed response headers on https://www.reedsemi.com/wp-json/*'
+name: Reed Semiconductor Rate Limits
+description: >-
+  Reed Semiconductor publishes no rate limits, and none were observed at runtime. This is
+  an honest zero: the pipeline made repeated anonymous calls to the Store API, the content
+  API and the MCP endpoint and inspected every response header set.
+limit_count: 0
+documented: false
+docs: null
+headers_returned: []
+status_on_exhaustion: null
+retry_after: false
+limits: []
+observed_headers_of_interest:
+- name: X-WP-Total
+  value: '99'
+  note: Pagination total, not a quota.
+- name: X-WP-TotalPages
+  value: '33'
+- name: cf-ray
+  note: Cloudflare edge request id — the host is behind Cloudflare, so an undocumented
+    edge rate limit or bot rule may exist even though no quota header is returned.
+- name: cf-cache-status
+  value: HIT
+  note: >-
+    Catalog reads are edge-cached for up to 604800s, which absorbs most read volume before
+    it reaches the origin. A polite consumer is unlikely to hit any origin limit.
+enforcement_note: >-
+  No RateLimit-*, X-RateLimit-* or Retry-After header appeared on any of the ~30 requests
+  made during this pass, and no 429 was observed. Absence of a published limit is not a
+  guarantee of none — Cloudflare and Wordfence are both deployed on this host and either
+  can throttle or challenge without emitting a standard header.
+x-evidence:
+  fetched: '2026-08-26'
+  probes:
+  - url: https://www.reedsemi.com/wp-json/wc/store/v1/products?per_page=1
+    status: 200
+  - url: https://www.reedsemi.com/wp-json/wc/store/v1/products/categories
+    status: 200
+  - url: https://www.reedsemi.com/wp-json/wp/v2/posts?per_page=10
+    status: 200
+  - url: https://www.reedsemi.com/wp-json/mcp/novamira-oauth
+    status: 401

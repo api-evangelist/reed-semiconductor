@@ -1,0 +1,74 @@
+generated: '2026-08-26'
+method: probed
+source: https://www.reedsemi.com/.well-known/
+name: Reed Semiconductor Well-Known Documents
+description: >-
+  Probe of the RFC 8615 /.well-known/ namespace on the single Reed Semiconductor host.
+  Three real documents are served — OpenID Provider metadata, OAuth 2.0 Authorization
+  Server metadata (RFC 8414) and OAuth 2.0 Protected Resource metadata (RFC 9728) —
+  all published by the Novamira WordPress plugin (v1.11.4) to advertise the site's
+  Model Context Protocol server. Every other probed path returned HTTP 200 carrying
+  the WordPress theme's HTML catch-all page rather than a document; those are recorded
+  as misses, not hits.
+note: >-
+  IMPORTANT: www.reedsemi.com answers HTTP 200 with the site's HTML shell for ANY
+  unmatched path, including every /.well-known/* path it does not implement. Status
+  code alone is not evidence here — each row below was judged on the response body.
+  Only the three JSON documents parse as real well-known documents.
+hosts:
+- host: www.reedsemi.com
+  documents:
+  - path: /.well-known/openid-configuration
+    status: 200
+    file: well-known/reed-semiconductor-openid-configuration.json
+    content_type: application/json
+    document: true
+  - path: /.well-known/oauth-authorization-server
+    status: 200
+    file: well-known/reed-semiconductor-oauth-authorization-server.json
+    content_type: application/json
+    document: true
+  - path: /.well-known/oauth-protected-resource
+    status: 200
+    file: well-known/reed-semiconductor-oauth-protected-resource.json
+    content_type: application/json
+    document: true
+  - path: /.well-known/security.txt
+    status: 200
+    file: null
+    content_type: text/html
+    document: false
+    note: HTML catch-all page, not an RFC 9116 security.txt — recorded as a miss.
+  - path: /.well-known/api-catalog
+    status: 200
+    file: null
+    content_type: text/html
+    document: false
+    note: HTML catch-all page, not an RFC 9727 API catalog — recorded as a miss.
+  - path: /.well-known/ai-plugin.json
+    status: 200
+    file: null
+    content_type: text/html
+    document: false
+    note: HTML catch-all page — recorded as a miss.
+  - path: /.well-known/agent-card.json
+    status: 200
+    file: null
+    content_type: text/html
+    document: false
+    note: HTML catch-all page, not an A2A AgentCard — recorded as a miss.
+  - path: /.well-known/agent.json
+    status: 200
+    file: null
+    content_type: text/html
+    document: false
+    note: HTML catch-all page (pre-0.3 A2A path) — recorded as a miss.
+findings:
+  documents_served: 3
+  oauth_issuer: https://www.reedsemi.com
+  protected_resource: https://www.reedsemi.com/wp-json/mcp/novamira-oauth
+  scopes_supported:
+  - mcp
+  security_txt: false
+  api_catalog: false
+  agent_card: false

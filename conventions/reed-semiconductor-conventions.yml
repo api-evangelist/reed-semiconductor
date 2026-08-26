@@ -1,0 +1,182 @@
+generated: '2026-08-26'
+method: probed
+source: https://www.reedsemi.com/wp-json/
+name: Reed Semiconductor API Conventions
+description: >-
+  Cross-cutting runtime semantics for the REST surfaces Reed Semiconductor's WordPress
+  deployment serves. Reed publishes no API documentation, so every convention below was
+  observed on live responses or read from the server's own route-discovery index, never
+  from a docs page. The conventions are those of WordPress core and the WooCommerce Store
+  API; that is a finding in itself — an integrator gets a well-known, stable contract, but
+  one the provider neither documents nor commits to.
+authentication:
+  style: mixed
+  public_read: none
+  agent_surface: oauth2.1-bearer
+  writes: wordpress-application-passwords or cookie+X-WP-Nonce
+  detail: authentication/reed-semiconductor-authentication.yml
+versioning:
+  style: path-namespace
+  pattern: /wp-json/{namespace}/{version}/{resource}
+  observed:
+  - wc/store/v1
+  - wp/v2
+  - wc/v3
+  - wc/v2
+  - wc/v1
+  - novamira/v1
+  - wp-abilities/v1
+  namespace_count: 40
+  breaking_change_policy: null
+  note: >-
+    Versions are pinned in the path and multiple major versions are mounted side by side
+    (wc/v1, wc/v2, wc/v3), so an integrator can pin. No version negotiation header, no
+    published deprecation schedule.
+pagination:
+  style: page-number
+  request_params:
+  - name: page
+    default: 1
+  - name: per_page
+    default: 10
+    max: 100
+  response_headers:
+  - name: X-WP-Total
+    description: Total number of matching records.
+    observed_value: '99'
+  - name: X-WP-TotalPages
+    description: Total number of pages at the current per_page.
+    observed_value: '33'
+  - name: Link
+    description: >-
+      RFC 8288 web linking. rel="next" and rel="prev" URLs for cursor-free traversal.
+    observed_value: >-
+      <https://www.reedsemi.com/wp-json/wc/store/v1/products?per_page=3&page=2>; rel="next"
+  cors_exposed: true
+  note: >-
+    Pagination metadata is in headers, not the body, and the headers are explicitly listed
+    in Access-Control-Expose-Headers, so a browser or agent client can read them cross-origin.
+filtering_and_search:
+  supported: true
+  examples:
+  - GET /wc/store/v1/products?category={id}
+  - GET /wc/store/v1/products?search={term}
+  - GET /wp/v2/posts?search={term}
+  note: Parameter set is enumerable from the route index; not documented by the provider.
+error_envelope:
+  format: wordpress-rest
+  rfc9457: false
+  shape:
+    code: machine-readable string slug
+    message: human-readable sentence
+    data:
+      status: HTTP status integer
+  example: '{"code":"rest_oauth_required","message":"OAuth authentication required.","data":{"status":401}}'
+  content_type: application/json; charset=UTF-8
+  detail: errors/reed-semiconductor-problem-types.yml
+  note: >-
+    Not RFC 9457 problem+json. The envelope is stable and machine-readable but uses
+    WordPress's own three-key shape and a plain application/json content type.
+rate_limit_signaling:
+  headers_observed: []
+  status_on_exhaustion: null
+  note: >-
+    No RateLimit-*, X-RateLimit-* or Retry-After header was returned on any probed
+    response, and no limit is published. See rate-limits/reed-semiconductor-rate-limits.yml.
+idempotency:
+  supported: false
+  header: null
+  note: >-
+    No Idempotency-Key header is accepted or advertised on any route, and none appears in
+    Access-Control-Allow-Headers. Cart mutations (add-item, update-item, apply-coupon) are
+    not idempotent — a repeated add-item increments quantity. No Idempotency pointer is
+    emitted in apis.yml because the provider genuinely does not support it.
+request_tracing:
+  request_id_header: null
+  observed_headers:
+  - name: cf-ray
+    description: >-
+      Cloudflare edge request identifier. Present on every response and usable for tracing
+      with the CDN, but it is infrastructure, not an application request id.
+  - name: X-LiteSpeed-Cache-Control
+    description: Origin cache directive (LiteSpeed behind Cloudflare).
+  - name: cf-cache-status
+    description: HIT/DYNAMIC — reveals whether a catalog read was served from edge cache.
+caching:
+  catalog_reads: 'public, max-age=604800 (7 days) at the LiteSpeed origin; Cloudflare cf-cache-status HIT'
+  authenticated_reads: 'no-store, no-cache, must-revalidate, max-age=0'
+  note: >-
+    Catalog data is aggressively edge-cached, so an agent polling for new parts may see
+    up to a week of staleness. There is no ETag or Last-Modified conditional-request
+    support observed on the Store API.
+field_expansion:
+  supported: true
+  params:
+  - _fields — comma-separated sparse fieldset (WordPress core)
+  - _embed — embed linked resources
+  - context=view|embed|edit — response shape selector
+  note: Standard WordPress core conventions; confirmed present in the route index args.
+metadata:
+  supported: false
+  note: No customer-writable metadata surface on the public read routes.
+reversibility:
+  grade: documented
+  applies_to: WooCommerce Store API cart surface
+  write_surface_present: true
+  detail: >-
+    The only anonymous write surface is the WooCommerce cart. Every cart mutation has a
+    matching reversal operation mounted in the route index, so an agent that adds the
+    wrong item can undo it. No time window is stated anywhere, because Reed publishes no
+    documentation at all — the cart's real lifetime is governed by the undocumented
+    WooCommerce session cookie, not by a policy the provider states. Grade is therefore
+    documented, not verified: the reversal path is provably present, the window is not.
+  operations:
+  - action: add item to cart
+    endpoint: POST /wc/store/v1/cart/add-item
+    reversal: POST /wc/store/v1/cart/remove-item
+    also: DELETE /wc/store/v1/cart/items/{key}
+    window_stated: false
+  - action: update cart item quantity
+    endpoint: POST /wc/store/v1/cart/update-item
+    reversal: POST /wc/store/v1/cart/update-item (re-set prior quantity)
+    window_stated: false
+  - action: apply coupon
+    endpoint: POST /wc/store/v1/cart/apply-coupon
+    reversal: POST /wc/store/v1/cart/remove-coupon
+    also: DELETE /wc/store/v1/cart/coupons/{code}
+    window_stated: false
+  - action: empty the cart
+    endpoint: DELETE /wc/store/v1/cart/items
+    reversal: null
+    window_stated: false
+    note: Bulk delete has no undo; items must be re-added individually.
+  - action: place order
+    endpoint: POST /wc/store/v1/checkout
+    reversal: null
+    window_stated: false
+    note: >-
+      NOT REACHABLE IN PRACTICE. Every product returns is_purchasable false with a zero
+      price, so checkout cannot be exercised. No cancel, refund or void operation is
+      mounted on the public Store API. Treat the ordering surface as inert.
+  never_reversible:
+  - No refund, void, cancel or restore operation exists on any public route.
+dry_run_mode:
+  supported: false
+  note: No dry-run, preview or validate-only parameter is present on any route.
+cross_references:
+  authentication: authentication/reed-semiconductor-authentication.yml
+  errors: errors/reed-semiconductor-problem-types.yml
+  lifecycle: lifecycle/reed-semiconductor-lifecycle.yml
+  rate_limits: rate-limits/reed-semiconductor-rate-limits.yml
+  scopes: scopes/reed-semiconductor-scopes.yml
+x-evidence:
+  fetched: '2026-08-26'
+  probes:
+  - url: https://www.reedsemi.com/wp-json/wc/store/v1
+    status: 200
+  - url: https://www.reedsemi.com/wp-json/wc/store/v1/products?per_page=3
+    status: 200
+  - url: https://www.reedsemi.com/wp-json/wp/v2
+    status: 200
+  - url: https://www.reedsemi.com/wp-json/mcp/novamira-oauth
+    status: 401
