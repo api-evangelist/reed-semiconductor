@@ -36,6 +36,17 @@ tags:
 - Semiconductors
 - Power Management
 - Electronic Components
+- Data-Center
+- Artificial Intelligence
+- Automotive
+- Hardware
+- Manufacturing
+- Product Catalog
+tags_raw:
+- Company
+- Semiconductors
+- Power Management
+- Electronic Components
 - Data Center
 - Artificial Intelligence
 - Automotive
@@ -103,6 +114,10 @@ apis:
   humanURL: https://www.reedsemi.com/
   baseURL: https://www.reedsemi.com/wp-json/mcp/novamira-oauth
   tags:
+  - MCP
+  - Agents
+  - Authentication
+  tags_raw:
   - MCP
   - Agents
   - OAuth
