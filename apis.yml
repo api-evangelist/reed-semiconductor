@@ -49,7 +49,7 @@ tags:
 - Semiconductors
 - Power Management
 - Electronic Components
-- Data-Center
+- Data Center
 - Artificial Intelligence
 - Automotive
 - Hardware
@@ -66,52 +66,22 @@ tags_raw:
 - Hardware
 - Manufacturing
 - Product Catalog
+- Data-Center
 apis:
-- aid: reed-semiconductor:reed-semiconductor-store-api
-  name: Reed Semiconductor Store API
-  description: 'The WooCommerce Store API served from the Reed Semiconductor corporate site. Anonymous,
-    read-only over the product catalog: 99 power-management parts (multiphase controllers, smart power
-    stages, eFuses, power modules, IBCs, POL converters) organised into 81 categories spanning applications
-    (Data Center and AI, Automotive, Communication Equipment, Industrial, Personal Electronics) and technology
-    axes (48V, 12V, 3.3V, DC/DC module). Cart and checkout routes are mounted by WooCommerce but every
-    product returns is_purchasable false with a zero price, so the surface is a catalog, not a storefront.'
-  humanURL: https://www.reedsemi.com/products/
-  baseURL: https://www.reedsemi.com/wp-json/wc/store/v1
+- aid: reed-semiconductor:reedsemi-com-website-wordpress-rest
+  name: Reed Semiconductor Website (WordPress REST)
+  description: 'The public WordPress REST API (wp-json) of the Reed Semiconductor website at www.reedsemi.com:
+    the route index of the site''s content management system, catalogued as one site surface rather than
+    as separate APIs.'
+  baseURL: https://www.reedsemi.com/wp-json
   tags:
-  - Product Catalog
-  - Semiconductors
-  - Power Management
-  - Commerce
+  - WordPress
+  x-surface: platform-generated
   properties:
-  - type: Authentication
-    url: authentication/reed-semiconductor-authentication.yml
-  - type: Conventions
-    url: conventions/reed-semiconductor-conventions.yml
-  - type: ErrorCatalog
-    url: errors/reed-semiconductor-problem-types.yml
-  - type: DataModel
-    url: data-model/reed-semiconductor-data-model.yml
-  - type: RateLimits
-    url: rate-limits/reed-semiconductor-rate-limits.yml
-  - type: Plans
-    url: plans/reed-semiconductor-plans-pricing.yml
-- aid: reed-semiconductor:reed-semiconductor-content-api
-  name: Reed Semiconductor Content API
-  description: The WordPress REST API (wp/v2) served from the Reed Semiconductor corporate site. Anonymous
-    read access to newsroom posts, pages, media, categories and taxonomies — the machine-readable form
-    of the Reedsemi newsroom, which publishes product introductions, funding announcements and patent-proceeding
-    news.
-  humanURL: https://www.reedsemi.com/newsroom/
-  baseURL: https://www.reedsemi.com/wp-json/wp/v2
-  tags:
-  - Content
-  - News
-  - Media
-  properties:
-  - type: Authentication
-    url: authentication/reed-semiconductor-authentication.yml
-  - type: Conventions
-    url: conventions/reed-semiconductor-conventions.yml
+  - type: Documentation
+    url: https://www.reedsemi.com/wp-json
+  x-platform: wordpress
+  x-platform-surface: rest
 - aid: reed-semiconductor:reed-semiconductor-mcp
   name: Reed Semiconductor MCP Server
   description: A Model Context Protocol server mounted at the Reed Semiconductor apex domain by the Novamira
@@ -137,6 +107,9 @@ apis:
     url: scopes/reed-semiconductor-scopes.yml
   - type: Authentication
     url: authentication/reed-semiconductor-authentication.yml
+  x-surface: platform-generated
+  x-platform: wordpress
+  x-platform-surface: mcp-plugin
 maintainers:
 - FN: Kin Lane
   email: kin@apievangelist.com
