@@ -64,5 +64,116 @@
 > Full detail: **[Where this data comes from](https://apievangelist.com/about/where-our-data-comes-from)**
 <!-- API-EVANGELIST-PROVENANCE:END -->
 
-Reed Semiconductor is a company surfaced via the API Evangelist harvest backlog (source: secondary-market) and added to the network as a stub for full-pipeline profiling.
-- https://forgeglobal.com/reed-semiconductor_stock/
+Reed Semiconductor Corp. is a fabless power-management semiconductor company founded in 2019 and headquartered in Rhode Island, USA, with offices in Taipei, Shenzhen and Bengaluru. The name stands for Robust, Efficient, Eco-friendly and Dense power solutions. It designs multiphase DC-DC controllers, smart power stages, half-bridge power stages, point-of-load converters, power modules, intermediate bus converters, eFuses and power multiplexers for data center and AI/HPC accelerators, 48V and 12V distribution, communication and datacom equipment, automotive ADAS and infotainment, industrial systems and personal electronics. Reed does not operate a developer program, but its WordPress/WooCommerce corporate site exposes real machine-readable surfaces: an anonymous WooCommerce Store API serving the 99-part parametric product catalog across 81 application and technology categories, the WordPress content API, and an OAuth 2.1 protected Model Context Protocol server published through RFC 8414 and RFC 9728 metadata at the apex domain.
+
+**Areas:** Company · Semiconductors · Power Management · Electronic Components · Data Center · Artificial Intelligence · Automotive · Hardware · Manufacturing · Product Catalog
+
+## Reed Semiconductor on APIs.io
+
+Everything profiled for Reed Semiconductor is published on APIs.io rather than in this repository. Start at the provider page — **[apis.io/providers/reed-semiconductor/](https://apis.io/providers/reed-semiconductor/)** — or go straight to one of the APIs or properties below.
+
+### APIs (2)
+
+- [Reed Semiconductor Website (WordPress REST)](https://apis.io/apis/reed-semiconductor/reedsemi-com-website-wordpress-rest/) — The public WordPress REST API (wp-json) of the Reed Semiconductor website at www.reedsemi.com: the route index of the site's content management system,…
+- [Reed Semiconductor MCP Server](https://apis.io/apis/reed-semiconductor/reed-semiconductor-mcp/) — A Model Context Protocol server mounted at the Reed Semiconductor apex domain by the Novamira WordPress plugin (v1.11.4). It advertises itself through RFC…
+
+### Published properties
+
+Each property below is a page on APIs.io carrying the machine-readable artifact and what it says.
+
+#### MCP servers (1)
+
+Model Context Protocol servers that expose the API to agents.
+
+- [Reed Semiconductor MCP Server](https://apis.io/servers/reed-semiconductor/reed-semiconductor-mcp-server/)
+
+#### Security (2)
+
+Authentication, trust centre, and vulnerability disclosure.
+
+- [Reed Semiconductor Authentication](https://apis.io/security/reed-semiconductor/reed-semiconductor-authentication/)
+- [Reed Semiconductor Domain Security](https://apis.io/security/reed-semiconductor/reed-semiconductor-domain-security/)
+
+#### OAuth scopes (1)
+
+The permissions the API asks for.
+
+- [Reed Semiconductor Scopes](https://apis.io/scopes/reed-semiconductor/reed-semiconductor-scopes/)
+
+#### Plans and pricing (1)
+
+Published plans, tiers and prices.
+
+- [Reed Semiconductor Plans Pricing](https://apis.io/plans/reed-semiconductor/reed-semiconductor-plans-pricing/)
+
+#### Rate limits (1)
+
+Published request limits.
+
+- [Reed Semiconductor Rate Limits](https://apis.io/rate-limits/reed-semiconductor/reed-semiconductor-rate-limits/)
+
+## Where to find this API
+
+Links to the company's own pages. This repository publishes no copy of their specifications — the canonical document is theirs and lives at the URLs below.
+
+- [Website](https://www.reedsemi.com/)
+- [Sign up](https://www.reedsemi.com/my-account/)
+- [Support](https://www.reedsemi.com/contact-us/)
+- [Blog](https://www.reedsemi.com/newsroom/)
+- [Terms of service](https://www.reedsemi.com/terms-of-use/)
+- [Privacy policy](https://www.reedsemi.com/privacy-policy/)
+
+## API Evangelist rating
+
+**Kin Score 16.6** — emerging · rubric 0.25.0 · scored 2026-10-23
+
+| Facet | Score |
+|---|---|
+| Discoverability | 60.0 |
+| Contract quality | 0.0 |
+| Contract governance | 18.2 |
+| Operational transparency | 0.0 |
+| Developer ergonomics | 21.4 |
+| Access clarity | 7.9 |
+
+**Agent readiness 26.3** — agent-aware
+
+| Agent-readiness dimension | Result |
+|---|---|
+| Spec Presence | — |
+| Agentic Access | — |
+| Reversibility Documented | — |
+| MCP Server | platform (partial credit) |
+| Auth Clarity | served (partial credit) |
+| Idempotency | — |
+| Error Semantics | documented (partial credit) |
+| OpenAPI Examples | — |
+| Rate Limit Signal | documented (partial credit) |
+| Event Surface Described | — |
+| Agent Skills | — |
+| Well Known Catalog | — |
+| Consent Identity | — |
+| Agent Card | — |
+| Dry Run Mode | — |
+| Delegated Identity | served (partial credit) |
+| Protected Resource Metadata | verified |
+| Dynamic Client Registration | yes |
+| Agentic Commerce | — |
+| Pagination Ratio | na |
+| Operation Distinctiveness | na |
+
+**Regulatory alignment 30.0** — Energy & Utilities
+
+The rubric is published at [github.com/api-evangelist/kin-score](https://github.com/api-evangelist/kin-score). The per-check breakdown behind these numbers — which checks were earned, partial or missed — along with score history and how this provider compares to its peers, is available at [apis.io/providers/reed-semiconductor/](https://apis.io/providers/reed-semiconductor/).
+
+## How this profile is made
+
+API Evangelist profiles a company's public API surface the way a developer would find it: the website, developer portal and documentation, the specifications it publishes, its public repositories, and its pricing, status and changelog pages. From that it derives the properties above — contracts split per API, workflows, schemas, collections, governance rules, plans and rate limits — and scores them against the published [Kin Score rubric](https://github.com/api-evangelist/kin-score).
+
+The artifacts are published on [APIs.io](https://apis.io), not in this repository. This repository is the public record for Reed Semiconductor: the place to say something is wrong, missing or out of date, and to ask for a re-score or a removal.
+
+## Open an issue
+
+- **Something about this listing** — a wrong description, a missing API, a stale artifact or a question about the rating: [open an issue on this repository](https://github.com/api-evangelist/reed-semiconductor/issues/new).
+- **A new API, or one that is not in the catalog yet** — [submit it on APIs.io](https://apis.io/add/).
+- **Anything else** — [the APIs.io inbox](https://github.com/api-search/inbox/issues/new) or [info@apievangelist.com](mailto:info@apievangelist.com).
